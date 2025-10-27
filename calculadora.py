@@ -9,7 +9,7 @@ def accion():
 
 
 def menu():
-    # Muestra el menú para que el usuario decida qué hacer
+    # Muestra el menú para que el usuario decida qué hacer (seleccionando un número)
     respuesta = int(input("¿Qué quieres hacer?\n"
                           "1. Continuar haciendo cálculos?\n"
                           "2. Reiniciar calculadora\n"
