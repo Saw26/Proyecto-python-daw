@@ -1,3 +1,29 @@
+import json
+
+def exportar_a_json():
+    try:
+        with open("tareas.txt","r",encoding="utf-8") as fichero:
+            lineas = fichero.readlines()
+            
+        tareas =[]
+        for linea in lineas:
+            partes = linea.strip().split(";")
+            tareas.append({
+                "id": partes[0],
+                "nombre": partes[1],
+                "descripcion": partes[2],
+                "prioridad": partes[3],
+                "categoria": partes[4]
+            })
+            
+        with open("tareas.json", "w", encoding="utf-8") as fichero:
+            json.dump(tareas,fichero,indent=4)
+        
+        print("Exportado a tareas.json!")
+    except FileNotFoundError:
+        print("No existe el fichero de Tareas.txt!")
+
+    
 def añadir_tareas():
     """
     Esta función le pide datos al usuario y añade una nueva tarea al fichero que tenemos de tareas.txt (y he añadido un control de errores)
@@ -165,7 +191,8 @@ def menu():
                           "2. Buscar una tarea\n"
                           "3. Listar mis tareas\n"
                           "4. Modificar una tarea\n"
-                          "5. borrar una tarea\n\n"))
+                          "5. borrar una tarea\n\n"
+                          "6.Importar a JSON\n\n"))
     return respuesta
             
             

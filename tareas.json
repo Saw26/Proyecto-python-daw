@@ -1,0 +1,9 @@
+[
+    {
+        "id": "1",
+        "nombre": "Aprobar Python",
+        "descripcion": "Crear un gestor de tareas para que Pedro me apruebe",
+        "prioridad": "Alta",
+        "categoria": "laboral"
+    }
+]

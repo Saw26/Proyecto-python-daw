@@ -1,4 +1,4 @@
-from gestor_tareas import añadir_tareas, buscar_tarea, listar_tareas,  eliminar_tareas, modificar_tareas, menu
+from gestor_tareas import añadir_tareas, buscar_tarea, listar_tareas,  eliminar_tareas, modificar_tareas, menu, exportar_a_json
 
 while True:
     print("\n")  # salto de línea antes de mostrar el menú
@@ -18,6 +18,9 @@ while True:
     elif opcion == 5:
         print("\n")
         eliminar_tareas()
+    elif opcion == 6:
+        print("\n")
+        exportar_a_json()
     else:
         print("Opción inválida")
         
