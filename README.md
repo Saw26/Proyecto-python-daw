@@ -7,3 +7,7 @@ He definido las funciones necesarias para agregar una tarea a un ficherito que t
 
 He ido poniendo comentarios de los 2 tipos, los docStrings y los de toda la vida!
 
+###  Actualización para la segunda entrega  del proyecto:
+-He añadido la funcionalidad de exportar las tareas a un json (concretamente a mi archivo tareas.json) y al revés, importar tareas desde json a mi lista de tareas (mi tareas.txt).
+-He añadido los log que me ha pedido el profesor  dentro de los except de mis funciones.
+

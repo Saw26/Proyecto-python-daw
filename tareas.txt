@@ -1,1 +1,3 @@
 1;Aprobar Python;Crear un gestor de tareas para que Pedro me apruebe;Alta;laboral
+2;Aprobar PHP;Aprobar PHP que se me pega el arroz;Alta;laboral
+3;Hacer la compra;Comprar comida para la semana;Media;personal

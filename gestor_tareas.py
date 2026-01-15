@@ -1,4 +1,11 @@
 import json
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    )
+# esto es para cambiar la configuración mínima del loggin porque si no ni info ni debug se muestran Pedro.
+
 
 def exportar_a_json():
     try:
@@ -17,12 +24,29 @@ def exportar_a_json():
             })
             
         with open("tareas.json", "w", encoding="utf-8") as fichero:
-            json.dump(tareas,fichero,indent=4)
+            json.dump(tareas,fichero)
         
-        print("Exportado a tareas.json!")
+        logging.info("Exportado a tareas.json")
+        logging.debug("Hemos creado la tarea por partes y la hemos añadido a su ficherito correspondiente")
     except FileNotFoundError:
-        print("No existe el fichero de Tareas.txt!")
-
+        logging.error("No existe el fichero de Tareas.txt!")
+        
+        
+def importar_json():
+    try:
+        with open("tareas.json","r",encoding="utf-8") as fichero:
+            tareas = json.load(fichero)
+        
+        with open("tareas.txt","w",encoding="utf-8") as fichero:
+            for tarea in tareas:
+                linea = f"{tarea['id']};{tarea['nombre']};{tarea['descripcion']};{tarea['prioridad']};{tarea['categoria']}\n"
+                fichero.write(linea)
+        
+        logging.info("Importado desde tareas.json!")
+    except FileNotFoundError:
+        logging.error("No existe el fichero de Tareas.json!")
+        
+        
     
 def añadir_tareas():
     """
@@ -31,11 +55,11 @@ def añadir_tareas():
     try:
         id = int(input("ID de la tarea (número): "))
     except ValueError:
-        print("El ID debe ser un número entero ")
+        logging.error("El ID debe ser un número entero ")
 
     nombre = input("Nombre de la tarea: ")
     if nombre == "":
-        print("El nombre no puede estar vacío ")
+        logging.warning("El nombre no puede estar vacío ")
 
     descripcion = input("Descripción de la tarea: ")
     prioridad = input("Prioridad (Alta/Media/Baja): ")
@@ -44,7 +68,7 @@ def añadir_tareas():
     # Una vez que le metemos los datos (la id, el nombre...) vamos a comprobar si todo está en su sitio y lo metemos al fichero
 
     if categoria != "personal" and categoria != "laboral" and categoria != "social":
-        print("Categoría inválida. Debe ser 'personal', 'laboral' o 'social' ")
+        logging.warning("Categoría inválida. Debe ser 'personal', 'laboral' o 'social' ")
 
     tarea = f"{id};{nombre};{descripcion};{prioridad};{categoria}\n"
 
@@ -53,7 +77,7 @@ def añadir_tareas():
     fichero.write(tarea)
     fichero.close()
 
-    print("Tarea añadida correctamente y guardada en tareas.txt")
+    logging.info("Tarea añadida correctamente y guardada en tareas.txt")
 
 
 def listar_tareas():
@@ -66,14 +90,14 @@ def listar_tareas():
         fichero.close()
 
         if len(lineas) == 0:
-            print("No hay tareas guardadas.")
+            logging.warning("No hay tareas guardadas.")
         else:
             print("\n--- LISTA DE TAREAS ---")
             for linea in lineas:
-                print(linea.strip()) # esto quita los espacios y demás al principio y al final (pero no en medio claro)
+                logging.debug(linea.strip()) # esto quita los espacios y demás al principio y al final (pero no en medio claro)
             print("-----------------------\n")
     except FileNotFoundError:
-        print("Todavía no existe el archivo de tareas ")
+        logging.error("Todavía no existe el archivo de tareas ")
         
         
         # aquí llamamos al fichero con todo lo que tenga, lee cada línea (y las separa claro) y si no encuentra nada le he metido un control de errores
@@ -95,16 +119,16 @@ def buscar_tarea():
             if partes[0] == id_buscar:
                 encontrado = True
                 print("\n--- TAREA ENCONTRADA!! ---")
-                print(f"ID: {partes[0]}")
-                print(f"Nombre: {partes[1]}")
-                print(f"Descripción: {partes[2]}")
-                print(f"Prioridad: {partes[3]}")
-                print(f"Categoría: {partes[4]}")
+                logging.debug(f"ID: {partes[0]}")
+                logging.debug(f"Nombre: {partes[1]}")
+                logging.debug(f"Descripción: {partes[2]}")
+                logging.debug(f"Prioridad: {partes[3]}")
+                logging.debug(f"Categoría: {partes[4]}")
                 print("------------------------\n")
         if not encontrado:
-            print("No se encontró ninguna tarea con ese ID ")
+            logging.warning("No se encontró ninguna tarea con ese ID ")
     except FileNotFoundError:
-        print("No existe el archivo de tareas ")
+        logging.error("No existe el archivo de tareas ")
 
 
 def eliminar_tareas():
@@ -128,9 +152,9 @@ def eliminar_tareas():
         # Aquí abro el fichero 2 veces (la primera para que lea todo lo que tiene y se guarde todo en "lineas" y luego en "w" para borrar la que le digamos
         # y si no coincide que vuelva a escribirla claro)
 
-        print("Tarea eliminada correctamente ")
+        logging.info("Tarea eliminada correctamente ")
     except FileNotFoundError:
-        print("No existe el archivo de tareas ")
+        logging.error("No existe el archivo de tareas ")
 
 
 def modificar_tareas():
@@ -150,13 +174,13 @@ def modificar_tareas():
             partes = linea.strip().split(";")
             if partes[0] == id_modificar:
                 encontrado = True
-                print("Datos actuales de la tarea:")
-                print(f"ID: {partes[0]}, Nombre: {partes[1]}, Descripción: {partes[2]}, Prioridad: {partes[3]}, Categoría: {partes[4]}")
-                print("¿Qué quieres modificar?")
-                print("1. Nombre")
-                print("2. Descripción")
-                print("3. Prioridad")
-                print("4. Categoría")
+                logging.info("Datos actuales de la tarea:")
+                logging.info(f"ID: {partes[0]}, Nombre: {partes[1]}, Descripción: {partes[2]}, Prioridad: {partes[3]}, Categoría: {partes[4]}")
+                logging.info("¿Qué quieres modificar?")
+                logging.info("1. Nombre")
+                logging.info("2. Descripción")
+                logging.info("3. Prioridad")
+                logging.info("4. Categoría")
                 opcion = input("Elige una opción (1-4): ")
 
                 if opcion == "1":
@@ -175,11 +199,11 @@ def modificar_tareas():
         fichero.close()
 
         if encontrado:
-            print("Tarea modificada correctamente ")
+            logging.info("Tarea modificada correctamente ")
         else:
-            print("No se encontró ninguna tarea con ese ID ")
+            logging.warning("No se encontró ninguna tarea con ese ID ")
     except FileNotFoundError:
-        print("No existe el archivo de tareas ")
+        logging.error("No existe el archivo de tareas ")
 
 
 
@@ -192,7 +216,8 @@ def menu():
                           "3. Listar mis tareas\n"
                           "4. Modificar una tarea\n"
                           "5. borrar una tarea\n\n"
-                          "6.Importar a JSON\n\n"))
+                          "6.Exportar a JSON\n"
+                          "7.Importar desde JSON\n\n"))
     return respuesta
             
             

@@ -1,4 +1,5 @@
-from gestor_tareas import añadir_tareas, buscar_tarea, listar_tareas,  eliminar_tareas, modificar_tareas, menu, exportar_a_json
+import logging
+from gestor_tareas import añadir_tareas, buscar_tarea, listar_tareas,  eliminar_tareas, modificar_tareas, menu, exportar_a_json, importar_json
 
 while True:
     print("\n")  # salto de línea antes de mostrar el menú
@@ -21,13 +22,16 @@ while True:
     elif opcion == 6:
         print("\n")
         exportar_a_json()
+    elif opcion == 7:
+        print("\n")
+        importar_json()
     else:
-        print("Opción inválida")
+        logging.warning("Opción inválida")
         
     print("\n")
     salir = input("¿Quieres seguir usando el programa? (s/n): ")
     if salir.lower() == "n":
-        print("Hasta luego!")
+        logging.info("Hasta luego!")
         break
 
 
