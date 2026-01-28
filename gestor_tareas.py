@@ -1,5 +1,8 @@
+from clases import *
+
 import json
 import logging
+
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -24,7 +27,7 @@ def exportar_a_json():
             })
             
         with open("tareas.json", "w", encoding="utf-8") as fichero:
-            json.dump(tareas,fichero)
+            json.dump(tareas,fichero,indent=4)
         
         logging.info("Exportado a tareas.json")
         logging.debug("Hemos creado la tarea por partes y la hemos añadido a su ficherito correspondiente")
@@ -56,10 +59,12 @@ def añadir_tareas():
         id = int(input("ID de la tarea (número): "))
     except ValueError:
         logging.error("El ID debe ser un número entero ")
+        return # para que slaga del programa si no es un número
 
     nombre = input("Nombre de la tarea: ")
     if nombre == "":
         logging.warning("El nombre no puede estar vacío ")
+        return 
 
     descripcion = input("Descripción de la tarea: ")
     prioridad = input("Prioridad (Alta/Media/Baja): ")
@@ -70,13 +75,12 @@ def añadir_tareas():
     if categoria != "personal" and categoria != "laboral" and categoria != "social":
         logging.warning("Categoría inválida. Debe ser 'personal', 'laboral' o 'social' ")
 
-    tarea = f"{id};{nombre};{descripcion};{prioridad};{categoria}\n"
+    tarea = Tarea(id, nombre, descripcion, prioridad, categoria)
+    tareaFinal = f"{tarea.id};{tarea.nombre};{tarea.descripcion};{tarea.prioridad};{tarea.categoria}\n"
 
-    fichero = open("tareas.txt", "a", encoding="utf-8") # No creo que haga falta explicarlo pero por si acaso,
-    #aquí abro el archivo en formato append con su codificación para evitar rollos de tildes, la ñ.., escribo sobre el y lo cierro. (y así con las demás funciones que haré)
-    fichero.write(tarea)
-    fichero.close()
-
+    with open("tareas.txt", "a", encoding="utf-8") as fichero:
+    #aquí abro el archivo en formato append con su codificación para evitar rollos de tildes, la ñ.., escribo sobre el y se cierra solo (por el with open) (y así con las demás funciones que haré)
+        fichero.write(tareaFinal)
     logging.info("Tarea añadida correctamente y guardada en tareas.txt")
 
 
@@ -84,126 +88,98 @@ def listar_tareas():
     """
     Esta función muestra todas las tareas guardadas en el fichero tareas.txt (con su control de errores como pides Pedro)
     """
-    try:
-        fichero = open("tareas.txt", "r", encoding="utf-8") #aquí en formato "read" porque solo quiero leerlo
-        lineas = fichero.readlines()
-        fichero.close()
-
-        if len(lineas) == 0:
-            logging.warning("No hay tareas guardadas.")
-        else:
-            print("\n--- LISTA DE TAREAS ---")
-            for linea in lineas:
-                logging.debug(linea.strip()) # esto quita los espacios y demás al principio y al final (pero no en medio claro)
-            print("-----------------------\n")
-    except FileNotFoundError:
-        logging.error("Todavía no existe el archivo de tareas ")
+    tareas = cargar_tareas()
+    if not tareas:
+        logging.warning("No hay tareas guardadas.")
+    else:
+        print("\n-----LISTA DE TAREAS -----")
+        for tarea in tareas:
+            tarea.mostrar_info()
+        print("------------------------------")
         
         
         # aquí llamamos al fichero con todo lo que tenga, lee cada línea (y las separa claro) y si no encuentra nada le he metido un control de errores
         
 def buscar_tarea():
     """
-    Esta función busca una tarea en el fichero de tareas.txt al meterle la ID (misma jugada, con su control de errores)
+    Esta función busca una tarea en el fichero de tareas.txt (que le pasamos desde la función cargar_tareas de su propio objeto)
     """
-    id_buscar = input("Introduce el ID de la tarea a buscar: ")
-
     try:
-        fichero = open("tareas.txt", "r", encoding="utf-8") #la misma jugada que para listarlas todas, solo que aquí solo cojo la que yo le diga.
-        lineas = fichero.readlines()
-        fichero.close()
+        id_buscar = int(input("ID de la tarea: "))
+    except ValueError:
+        logging.error("El ID debe ser un número entero")
+        return
 
-        encontrado = False
-        for linea in lineas:
-            partes = linea.strip().split(";")
-            if partes[0] == id_buscar:
-                encontrado = True
-                print("\n--- TAREA ENCONTRADA!! ---")
-                logging.debug(f"ID: {partes[0]}")
-                logging.debug(f"Nombre: {partes[1]}")
-                logging.debug(f"Descripción: {partes[2]}")
-                logging.debug(f"Prioridad: {partes[3]}")
-                logging.debug(f"Categoría: {partes[4]}")
-                print("------------------------\n")
-        if not encontrado:
-            logging.warning("No se encontró ninguna tarea con ese ID ")
-    except FileNotFoundError:
-        logging.error("No existe el archivo de tareas ")
+    tareas = cargar_tareas()
+    encontrado = False
+    for tarea in tareas:
+        if str(tarea.id) == str(id_buscar):
+            encontrado = True
+            print("\n--- TAREA ENCONTRADA!! ---")
+            tarea.mostrar_info()
+            print("------------------------\n")
+    if not encontrado:
+        logging.warning("No se encuentra la tarea con ese ID")
+
 
 
 def eliminar_tareas():
     """
-    Esta función elimina una tarea (por ID) del fichero tareas.txt (misma jugada, con su control de errores)
+    Esta función elimina una tarea (por ID) del fichero tareas.txt (misma jugada, tirando del objeto)
     """
     id_borrar = input("Introduce el ID de la tarea a eliminar: ")
-
-    try:
-        fichero = open("tareas.txt", "r", encoding="utf-8")
-        lineas = fichero.readlines()
-        fichero.close()
-
-        fichero = open("tareas.txt", "w", encoding="utf-8")
-        for linea in lineas:
-            partes = linea.strip().split(";")
-            if partes[0] != id_borrar:
+    
+    tareas = cargar_tareas()
+    with open("tareas.txt", "w", encoding="utf-8") as fichero:
+        for tarea in tareas:
+            if str(tarea.id) !=str(id_borrar):
+                linea = f"{tarea.id};{tarea.nombre};{tarea.descripcion};{tarea.prioridad};{tarea.categoria}\n"
                 fichero.write(linea)
-        fichero.close()
-        
-        # Aquí abro el fichero 2 veces (la primera para que lea todo lo que tiene y se guarde todo en "lineas" y luego en "w" para borrar la que le digamos
-        # y si no coincide que vuelva a escribirla claro)
-
-        logging.info("Tarea eliminada correctamente ")
-    except FileNotFoundError:
-        logging.error("No existe el archivo de tareas ")
+                
+    logging.info("Tarea eliminada correctamente")
 
 
 def modificar_tareas():
     """
-    Esta función modifica una tarea (por la ID que le metamos) del fichero tareas.txt (misma jugada, con su control de errores)
+    Esta función modifica una tarea (por la ID que le metamos) del fichero tareas.txt (misma jugada, tirando del objeto y sus métodos)
     """
     id_modificar = input("Introduce el ID de la tarea a modificar: ")
 
-    try:
-        fichero = open("tareas.txt", "r", encoding="utf-8")
-        lineas = fichero.readlines()
-        fichero.close()
+    tareas = cargar_tareas() 
+    encontrado = False
 
-        fichero = open("tareas.txt", "w", encoding="utf-8") # aquí lo abro en formato "write" para escribir sobre el ya que lo vamos a modificar claro.
-        encontrado = False
-        for linea in lineas:
-            partes = linea.strip().split(";")
-            if partes[0] == id_modificar:
-                encontrado = True
-                logging.info("Datos actuales de la tarea:")
-                logging.info(f"ID: {partes[0]}, Nombre: {partes[1]}, Descripción: {partes[2]}, Prioridad: {partes[3]}, Categoría: {partes[4]}")
-                logging.info("¿Qué quieres modificar?")
-                logging.info("1. Nombre")
-                logging.info("2. Descripción")
-                logging.info("3. Prioridad")
-                logging.info("4. Categoría")
-                opcion = input("Elige una opción (1-4): ")
+    for tarea in tareas:
+        if str(tarea.id) == str(id_modificar):
+            encontrado = True
+            logging.info("Datos actuales de la tarea:")
+            logging.info(f"ID: {tarea.id}, Nombre: {tarea.nombre}, Descripción: {tarea.descripcion}, Prioridad: {tarea.prioridad}, Categoría: {tarea.categoria}")
+            logging.info("¿Qué quieres modificar?")
+            logging.info("1. Nombre")
+            logging.info("2. Descripción")
+            logging.info("3. Prioridad")
+            logging.info("4. Categoría")
+            opcion = input("Elige una opción (1-4): ")
 
-                if opcion == "1":
-                    partes[1] = input("Nuevo nombre: ")
-                elif opcion == "2":
-                    partes[2] = input("Nueva descripción: ")
-                elif opcion == "3":
-                    partes[3] = input("Nueva prioridad: ")
-                elif opcion == "4":
-                    partes[4] = input("Nueva categoría: ")
+            if opcion == "1":
+                tarea.nombre = input("Nuevo nombre: ")
+            elif opcion == "2":
+                tarea.descripcion = input("Nueva descripción: ")
+            elif opcion == "3":
+                tarea.prioridad = input("Nueva prioridad: ")
+            elif opcion == "4":
+                tarea.categoria = input("Nueva categoría: ")
 
-                nueva_linea = f"{partes[0]};{partes[1]};{partes[2]};{partes[3]};{partes[4]}\n"
-                fichero.write(nueva_linea)
-            else:
-                fichero.write(linea)
-        fichero.close()
+    # Ahora reescribo el fichero con todas las tareas (modificada incluida)
+    with open("tareas.txt", "w", encoding="utf-8") as fichero:
+        for tarea in tareas:
+            linea = f"{tarea.id};{tarea.nombre};{tarea.descripcion};{tarea.prioridad};{tarea.categoria}\n"
+            fichero.write(linea)
 
-        if encontrado:
-            logging.info("Tarea modificada correctamente ")
-        else:
-            logging.warning("No se encontró ninguna tarea con ese ID ")
-    except FileNotFoundError:
-        logging.error("No existe el archivo de tareas ")
+    if encontrado:
+        logging.info("Tarea modificada correctamente ")
+    else:
+        logging.warning("No se encontró ninguna tarea con ese ID ")
+
 
 
 
@@ -215,9 +191,10 @@ def menu():
                           "2. Buscar una tarea\n"
                           "3. Listar mis tareas\n"
                           "4. Modificar una tarea\n"
-                          "5. borrar una tarea\n\n"
+                          "5. borrar una tarea\n"
                           "6.Exportar a JSON\n"
-                          "7.Importar desde JSON\n\n"))
+                          "7.Importar desde JSON\n"
+                          "8.salir del programa\n"))
     return respuesta
             
             

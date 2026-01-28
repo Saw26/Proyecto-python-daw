@@ -25,6 +25,9 @@ while True:
     elif opcion == 7:
         print("\n")
         importar_json()
+    elif opcion == 8:
+        print("Ale, Adios!")
+        break
     else:
         logging.warning("Opción inválida")
         
