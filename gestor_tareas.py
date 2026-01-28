@@ -79,7 +79,6 @@ def añadir_tareas():
     tareaFinal = f"{tarea.id};{tarea.nombre};{tarea.descripcion};{tarea.prioridad};{tarea.categoria}\n"
 
     with open("tareas.txt", "a", encoding="utf-8") as fichero:
-    #aquí abro el archivo en formato append con su codificación para evitar rollos de tildes, la ñ.., escribo sobre el y se cierra solo (por el with open) (y así con las demás funciones que haré)
         fichero.write(tareaFinal)
     logging.info("Tarea añadida correctamente y guardada en tareas.txt")
 
@@ -98,7 +97,7 @@ def listar_tareas():
         print("------------------------------")
         
         
-        # aquí llamamos al fichero con todo lo que tenga, lee cada línea (y las separa claro) y si no encuentra nada le he metido un control de errores
+    
         
 def buscar_tarea():
     """
