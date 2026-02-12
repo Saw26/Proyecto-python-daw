@@ -11,3 +11,13 @@ He ido poniendo comentarios de los 2 tipos, los docStrings y los de toda la vida
 -He añadido la funcionalidad de exportar las tareas a un json (concretamente a mi archivo tareas.json) y al revés, importar tareas desde json a mi lista de tareas (mi tareas.txt).
 -He añadido los log que me ha pedido el profesor  dentro de los except de mis funciones.
 
+### Actualización para la tercera entrega del proyecto:
+ -He modificado la funcionalidad de añadir tareas para que pregunte qué tipo de tarea quiere crear, si normal o completa.
+ (teniendo en cuenta que el resto de cosas que se pedían las hice préviamente en el examen):
+ 
+ -He añadido una subclase hija de tareas llamada TareaCompleta con un nuevo atributo llamado "fecha".
+ -He añadido métodos para buscar o "filtrar" tareas, por categoría o por palabra clave.
+ -He cambiado la estructura de mi .json tal y como se me pidió.
+ -He actualizado el menú, modificado las funcionalidades para que guarden un objeto en lugar de trabajar diréctamente con el fichero de tareas.txt.
+ -He añadido la funcionalidad de "genera_reporte" que me sirve para ordenar las tareas y para tener un contador de tareas (por categorias y totales).
+

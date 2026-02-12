@@ -1,23 +1,46 @@
 [
     {
-        "id": "1",
-        "nombre": "Aprobar Python",
-        "descripcion": "Crear un gestor de tareas para que Pedro me apruebe",
-        "prioridad": "Alta",
-        "categoria": "laboral"
+        "items": {
+            "id": "1",
+            "nombre": "Aprobar Python",
+            "descripcion": "Crear un gestor de tareas para que Pedro me apruebe",
+            "prioridad": "Alta",
+            "categoria": "laboral",
+            "Fecha": "2026-02-02"
+        },
+        "fecha_ultimo_guardado": "02/02/2026 20:43:15"
     },
     {
-        "id": "2",
-        "nombre": "Aprobar PHP",
-        "descripcion": "Aprobar PHP que se me pega el arroz",
-        "prioridad": "Alta",
-        "categoria": "laboral"
+        "items": {
+            "id": "2",
+            "nombre": "Aprobar PHP",
+            "descripcion": "Aprobar PHP que se me pega el arroz",
+            "prioridad": "Alta",
+            "categoria": "laboral",
+            "Fecha": "2026-02-02"
+        },
+        "fecha_ultimo_guardado": "02/02/2026 20:43:15"
     },
     {
-        "id": "3",
-        "nombre": "Hacer la compra",
-        "descripcion": "Comprar comida para la semana",
-        "prioridad": "Alta",
-        "categoria": "personal"
+        "items": {
+            "id": "3",
+            "nombre": "Hacer la compra",
+            "descripcion": "Comprar comida para la semana",
+            "prioridad": "Alta",
+            "categoria": "personal",
+            "Fecha": "2026-02-02"
+        },
+        "fecha_ultimo_guardado": "02/02/2026 20:43:15"
+    },
+    {
+        "items": {
+            "id": "4",
+            "nombre": "prueba",
+            "descripcion": "aaaaa",
+            "prioridad": "Alta",
+            "categoria": "laboral",
+            "Fecha": "2026-02-02"
+        },
+        "fecha_ultimo_guardado": "02/02/2026 20:43:15"
     }
 ]

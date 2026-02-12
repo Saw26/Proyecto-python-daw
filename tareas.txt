@@ -1,3 +1,4 @@
-1;Aprobar Python;Crear un gestor de tareas para que Pedro me apruebe;Alta;laboral
-2;Aprobar PHP;Aprobar PHP que se me pega el arroz;Alta;laboral
-3;Hacer la compra;Comprar comida para la semana;Alta;personal
+1;Aprobar Python;Crear un gestor de tareas para que Pedro me apruebe;Alta;laboral;2026-02-02
+2;Aprobar PHP;Aprobar PHP que se me pega el arroz;Alta;laboral;2026-02-02
+3;Hacer la compra;Comprar comida para la semana;Alta;personal;2026-02-02
+4;prueba;aaaaa;Alta;laboral;2026-02-02

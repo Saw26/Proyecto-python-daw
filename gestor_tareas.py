@@ -1,4 +1,6 @@
 from clases import *
+from datetime import date
+from datetime import datetime
 
 import json
 import logging
@@ -10,24 +12,30 @@ logging.basicConfig(
 # esto es para cambiar la configuración mínima del loggin porque si no ni info ni debug se muestran Pedro.
 
 
+
 def exportar_a_json():
+    """
+    Esta función coge el objeto tarea (que a su vez viene de tareas.txt) y lo convierte a una lista de objetos en JSON
+    EXAMEN: en lugar de llamar directamente al fichero tareas.txt y recorrerlo y trabajar sobre el, trabajo con el objeto tarea (con sus 2 claves)
+    """
     try:
-        with open("tareas.txt","r",encoding="utf-8") as fichero:
-            lineas = fichero.readlines()
-            
-        tareas =[]
-        for linea in lineas:
-            partes = linea.strip().split(";")
-            tareas.append({
-                "id": partes[0],
-                "nombre": partes[1],
-                "descripcion": partes[2],
-                "prioridad": partes[3],
-                "categoria": partes[4]
-            })
+        tareas = cargar_tareas()
+        arrayTareas =[]
+        for tarea in tareas:
+            arrayTareas.append({
+                "items":{
+                "id": tarea.id,
+                "nombre": tarea.nombre,
+                "descripcion": tarea.descripcion,
+                "prioridad": tarea.prioridad,
+                "categoria": tarea.categoria,
+                "Fecha": tarea.fecha
+            },
+                "fecha_ultimo_guardado": datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                })
             
         with open("tareas.json", "w", encoding="utf-8") as fichero:
-            json.dump(tareas,fichero,indent=4)
+            json.dump(arrayTareas,fichero,indent=4)
         
         logging.info("Exportado a tareas.json")
         logging.debug("Hemos creado la tarea por partes y la hemos añadido a su ficherito correspondiente")
@@ -36,30 +44,50 @@ def exportar_a_json():
         
         
 def importar_json():
+    """
+    Esta función funciona justo al revés que exportar_a_json, coge el ficherito tareas.json, lo reconvierte al formato de tareas.txt y lo sobreescribe.
+    """
+    
     try:
+        #abro el fichero para leer el json
         with open("tareas.json","r",encoding="utf-8") as fichero:
-            tareas = json.load(fichero)
-        
+           datos = json.loads(fichero)
+           
+        tareas = []
+        #convierto cada dato en un objeto
+        for tarea in datos:
+            tarea = Tarea(
+                tarea["id"],
+                tarea["nombre"],
+                tarea["descripcion"],
+                tarea["prioridad"],
+                tarea["categoria"]
+            )
+            tareas.append(tarea)
+        #ahora abro el fichero de tareas.txt para sobreescribirlo con las de json
+
         with open("tareas.txt","w",encoding="utf-8") as fichero:
             for tarea in tareas:
-                linea = f"{tarea['id']};{tarea['nombre']};{tarea['descripcion']};{tarea['prioridad']};{tarea['categoria']}\n"
+                linea = f"{tarea.id};{tarea.nombre};{tarea.descripcion};{tarea.prioridad};{tarea.categoria}\n"
                 fichero.write(linea)
+        logging.info("Tareas importadas desde json a txt! ")
         
-        logging.info("Importado desde tareas.json!")
     except FileNotFoundError:
-        logging.error("No existe el fichero de Tareas.json!")
+        logging.error("No existe el fichero Tareas.json..")
         
         
     
 def añadir_tareas():
     """
-    Esta función le pide datos al usuario y añade una nueva tarea al fichero que tenemos de tareas.txt (y he añadido un control de errores)
+    Esta función le pide datos al usuario y añade una nueva tarea al fichero tareas.txt.
+    Ahora pregunta si la tarea es NORMAL o COMPLETA (herencia).
     """
+
     try:
         id = int(input("ID de la tarea (número): "))
     except ValueError:
         logging.error("El ID debe ser un número entero ")
-        return # para que slaga del programa si no es un número
+        return
 
     nombre = input("Nombre de la tarea: ")
     if nombre == "":
@@ -69,18 +97,24 @@ def añadir_tareas():
     descripcion = input("Descripción de la tarea: ")
     prioridad = input("Prioridad (Alta/Media/Baja): ")
     categoria = input("Categoría (personal/laboral/social): ")
+
+    tipo = input("¿Qué tipo de tarea quieres crear? (normal/completa): ").strip().lower()
+
+    if tipo == "normal":
+        tarea = Tarea(id, nombre, descripcion, prioridad, categoria)
+        tareaFinal = f"{tarea.id};{tarea.nombre};{tarea.descripcion};{tarea.prioridad};{tarea.categoria}\n"
+    elif tipo == "completa":
+        fecha = date.today().isoformat()
+        tarea = TareaCompleta(id, nombre, descripcion, prioridad, categoria, fecha)
+        tareaFinal = f"{tarea.id};{tarea.nombre};{tarea.descripcion};{tarea.prioridad};{tarea.categoria};{tarea.fecha}\n"
+    else:
+        logging.error("Tipo inválido. Debe ser 'normal' o 'completa'.")
+        return
     
-    # Una vez que le metemos los datos (la id, el nombre...) vamos a comprobar si todo está en su sitio y lo metemos al fichero
-
-    if categoria != "personal" and categoria != "laboral" and categoria != "social":
-        logging.warning("Categoría inválida. Debe ser 'personal', 'laboral' o 'social' ")
-
-    tarea = Tarea(id, nombre, descripcion, prioridad, categoria)
-    tareaFinal = f"{tarea.id};{tarea.nombre};{tarea.descripcion};{tarea.prioridad};{tarea.categoria}\n"
-
     with open("tareas.txt", "a", encoding="utf-8") as fichero:
         fichero.write(tareaFinal)
     logging.info("Tarea añadida correctamente y guardada en tareas.txt")
+
 
 
 def listar_tareas():
@@ -102,25 +136,93 @@ def listar_tareas():
 def buscar_tarea():
     """
     Esta función busca una tarea en el fichero de tareas.txt (que le pasamos desde la función cargar_tareas de su propio objeto)
+    EXAMEN: MODIFICO LA FUNCIÓN PARA QUE ME BUSQUE DENTRO DE CUALQUIER CRITERIO UNA PALABRA CLAVE)
     """
-    try:
-        id_buscar = int(input("ID de la tarea: "))
-    except ValueError:
-        logging.error("El ID debe ser un número entero")
-        return
-
+    # MUY IMPORTANTE, a la hora de buscar la tarea como he puesto el .lower HAY que escribir la palabra en mayuscula
+    # por ejemplo yo tengo 2 tareas que llevan la palabra "Aprobar",
+    #  si escribes "Aprobar" NO te las sacará, hay que escribir "aprobar"
+    palabra = input("Introduce una palabra ( o ID) para buscar (clave): ")
     tareas = cargar_tareas()
-    encontrado = False
+    encontradas = []
     for tarea in tareas:
-        if str(tarea.id) == str(id_buscar):
-            encontrado = True
-            print("\n--- TAREA ENCONTRADA!! ---")
+        id = str(tarea.id).lower()
+        nombre = tarea.nombre.lower()
+        descripcion = tarea.descripcion.lower()
+        prioridad = tarea.prioridad.lower()
+        categoria = tarea.categoria.lower()
+        fecha = tarea.fecha
+        
+        if (palabra in id or
+            palabra in nombre or
+            palabra in descripcion or
+            palabra in prioridad or
+            palabra in categoria or
+            palabra in fecha):
+            encontradas.append(tarea)
+            
+    if not encontradas:
+        logging.warning("No se ha encontrado la tarea con esa palabra.." )
+        return
+    else:
+        logging.info("LISTA DE TAREAS CON BÚSQUEDA: ")
+        for tarea in encontradas:
             tarea.mostrar_info()
-            print("------------------------\n")
-    if not encontrado:
-        logging.warning("No se encuentra la tarea con ese ID")
+            logging.info("-------------------------")
 
 
+
+def buscar_categoria():
+    """
+    EXAMEN: vamos a modificar la función para que podamos buscar tareas de una categoria concreta
+    (HE HECHO ESTA FUNCIÓN POR SI LA DE ARRIBA NO TE SIRVE COMO BÚSQUEDA)
+    """
+    categoria = input("Escribe la categoría que quieras (laboral, personal o social) ")
+    tareas = cargar_tareas()
+    encontradas = []
+    for tarea in tareas:
+        if tarea.categoria == categoria.lower():
+            encontradas.append(tarea)
+            
+    if not encontradas:
+        logging.warning("No existe la tarea con esta categoría (o no has introducido bien la categoría..)")
+        return
+    else:
+        logging.info(f"TAREAS ENCONTRADAS DE LA CATEGORÍA: {categoria}---")
+        for tarea in encontradas:
+            tarea.mostrar_info()
+            logging.info("-----------------------------------")
+            
+
+def generar_reporte():
+    """
+    EXAMEN
+    Esta función muestra todas las tareas guardadas en el fichero tareas.txt (con su control de errores como pides Pedro)
+    """
+    personal = 0
+    laboral = 0
+    social = 0
+    tareas = cargar_tareas()
+    if not tareas:
+        logging.warning("No hay tareas guardadas.")
+    else:
+        print("\n-----LISTA DE TAREAS -----")
+        for tarea in tareas:
+            tarea.mostrar_info()
+            if tarea.categoria == "personal":
+                personal +=1
+            if tarea.categoria == "laboral":
+                laboral +=1
+            if tarea.categoria == "social":
+                social +=1
+        total = laboral + personal + social
+        print("CONTADOR DE TAREAS: ")
+        print(f"PERSONALES:       {personal} --")
+        print(f"LABORALES:       {laboral} --")
+        print(f"SOCIALES:       {social} --")
+        print("-----------------------------------")
+        print(f"TOTALES:        {total} ------------")
+        print("-----------------------------------")
+        
 
 def eliminar_tareas():
     """
@@ -193,7 +295,9 @@ def menu():
                           "5. borrar una tarea\n"
                           "6.Exportar a JSON\n"
                           "7.Importar desde JSON\n"
-                          "8.salir del programa\n"))
+                          "8.Generar Reporte\n"
+                          "9.buscar por Categoria\n"
+                          "10.salir del programa\n"))
     return respuesta
             
             

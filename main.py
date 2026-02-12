@@ -1,6 +1,5 @@
 import logging
-from gestor_tareas import añadir_tareas, buscar_tarea, listar_tareas,  eliminar_tareas, modificar_tareas, menu, exportar_a_json, importar_json
-
+from gestor_tareas import *
 while True:
     print("\n")  # salto de línea antes de mostrar el menú
     opcion = menu()
@@ -26,6 +25,12 @@ while True:
         print("\n")
         importar_json()
     elif opcion == 8:
+        print("\n")
+        generar_reporte()
+    elif opcion == 9:
+        print("\n")
+        buscar_categoria()
+    elif opcion == 10:
         print("Ale, Adios!")
         break
     else:
