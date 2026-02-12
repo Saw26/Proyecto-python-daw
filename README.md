@@ -9,7 +9,7 @@ He ido poniendo comentarios de los 2 tipos, los docStrings y los de toda la vida
 
 ###  Actualización para la segunda entrega  del proyecto:
 -He añadido la funcionalidad de exportar las tareas a un json (concretamente a mi archivo tareas.json) y al revés, importar tareas desde json a mi lista de tareas (mi tareas.txt).
--He añadido los log que me ha pedido el profesor  dentro de los except de mis funciones.
+ -He añadido los log que me ha pedido el profesor dentro de los except de mis funciones. -Como actualización extra he metido una clase Tarea y he cambiado la lógica de las funciones, en lugar de trabbajar diréctamente con el fichero trabajan sobre el objeto tarea.
 
 ### Actualización para la tercera entrega del proyecto:
  -He modificado la funcionalidad de añadir tareas para que pregunte qué tipo de tarea quiere crear, si normal o completa.
